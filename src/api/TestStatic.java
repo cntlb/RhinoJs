@@ -17,6 +17,7 @@ public class TestStatic {
 		Script script = cx.compileReader(in, args[0], 0, null);
 		Scriptable scope = cx.initStandardObjects();
 		ScriptableObject.defineClass(scope, NativeStaticApi.class);
+		ScriptableObject.defineClass(scope, NativeStaticApi.StaticInner.class);
 		script.exec(cx,scope);
 		
 		if(args.length < 2){

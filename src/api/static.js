@@ -1,2 +1,3 @@
 
 Static.sMethod()
+StaticInner.call()
