@@ -3,10 +3,13 @@ package api;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -55,13 +58,16 @@ public class TestMultiJs {
 		Scriptable scope = sContext.initStandardObjects(new NativeNormalApi(),false);
 		//register api
 		((ScriptableObject)scope).defineFunctionProperties(new String[]{"mToString","mPrint"}, NativeNormalApi.class, 0);
+		Class<?> class1 = Const.class;
+		ScriptableObject.putProperty(scope, class1.getSimpleName(), classConstantsToJSObject(class1));
 		//load js
 		Reader in = new FileReader(sourceName);
-		Script script = sContext.compileReader(in, sourceName, 0, null);
-		
-		//execute script
-		script.exec(sContext, scope);
-		states.add(new ScriptState(script, scope, sourceName));
+//		Script script = sContext.compileReader(in, sourceName, 0, null);
+//		
+//		//execute script
+//		script.exec(sContext, scope);
+		sContext.evaluateReader(scope, in, sourceName, 1, null);
+		states.add(new ScriptState(null, scope, sourceName));
 	}
 
 	private static void checkArgs(String[] args) {
@@ -71,5 +77,24 @@ public class TestMultiJs {
 			System.exit(1);
 		}
 	}
+	
+	public static ScriptableObject classConstantsToJSObject(Class<?> clazz) {
+        ScriptableObject obj = new NativeObject();
+        Field[] arr$ = clazz.getFields();
+        int len$ = arr$.length;
+        for (int i$ = 0; i$ < len$; i$ += 1) {
+            Field field = arr$[i$];
+            int fieldModifiers = field.getModifiers();
+            if (Modifier.isStatic(fieldModifiers) && Modifier.isPublic(fieldModifiers)
+            		&& Modifier.isFinal(fieldModifiers)) {
+                try {
+                    obj.putConst(field.getName(), obj, field.get(null));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return obj;
+    }
 
 }

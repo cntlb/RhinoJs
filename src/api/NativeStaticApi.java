@@ -1,14 +1,19 @@
 package api;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.annotations.JSStaticFunction;
 
 public class NativeStaticApi extends ScriptableObject {
 	private static final long serialVersionUID = -5695271009600534723L;
-
+	public NativeStaticApi() {
+		System.out.println("NativeStaticApi constructor");
+	}
+	
 	@Override
 	public String getClassName() {
+		System.out.println("NativeStaticApi.getClassName");
 		return "Static";
 	}
 	
@@ -18,6 +23,7 @@ public class NativeStaticApi extends ScriptableObject {
 	}
 	
 	/**
+	 * <pre>
 	 * Exception in thread "main" org.mozilla.javascript.EvaluatorException: Cannot load class "api.NativeStaticApi$StaticInner" which has no zero-parameter constructor.
 		at org.mozilla.javascript.DefaultErrorReporter.runtimeError(DefaultErrorReporter.java:77)
 		at org.mozilla.javascript.Context.reportRuntimeError(Context.java:954)
@@ -27,6 +33,8 @@ public class NativeStaticApi extends ScriptableObject {
 		at org.mozilla.javascript.ScriptableObject.defineClass(ScriptableObject.java:1279)
 		at org.mozilla.javascript.ScriptableObject.defineClass(ScriptableObject.java:1212)
 		at api.TestStatic.main(TestStatic.java:20)
+		</pre>
+		@see ScriptableObject#defineClass(Scriptable, Class)
 	 */
 	public static class StaticInner extends ScriptableObject {
 
